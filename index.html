@@ -221,7 +221,8 @@ function draw(){filtros();sync();const R=F(0,0),n=R.length;
 draw();
 function vivo(t,c){const e=$('#live');e.className='hb '+c;e.querySelector('span').textContent=t}
 let enVivo=false;
-async function cargar(){try{const r=await fetch(API,{cache:'no-store',signal:AbortSignal.timeout?AbortSignal.timeout(25000):undefined}),j=await r.json();if(!j.ok)throw new Error(j.error);const def=S.d1==DM&&S.d2==D1,ni=j.items.length!=IT.length;D=j.filas;IT=j.items;rango();if(def){S.d1=DM;S.d2=D1}if(ni)S.it=-1;enVivo=true;vivo('En vivo · actualizado '+new Date(j.actualizado).toLocaleString('es-PE',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}),'ok');draw()}catch(e){if(!enVivo)vivo('Sin conexión con el Sheet · datos guardados','bad')}}
+async function pedir(){const r=await fetch(API,{cache:'no-store',signal:AbortSignal.timeout?AbortSignal.timeout(25000):undefined}),j=await r.json();if(!j.ok)throw new Error(j.error);return j}
+async function cargar(){try{let j;for(let k=0;k<3&&!j;k++){try{j=await pedir()}catch(e){if(k==2)throw e;if(!enVivo)vivo('Conectando con el Sheet… (reintento '+(k+1)+')','');await new Promise(r=>setTimeout(r,4000))}}const def=S.d1==DM&&S.d2==D1,ni=j.items.length!=IT.length;D=j.filas;IT=j.items;rango();if(def){S.d1=DM;S.d2=D1}if(ni)S.it=-1;enVivo=true;vivo('En vivo · actualizado '+new Date(j.actualizado).toLocaleString('es-PE',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}),'ok');draw()}catch(e){if(!enVivo)vivo('Sin conexión con el Sheet · datos guardados','bad')}}
 cargar();setInterval(cargar,5*60e3);
 let rz;addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(()=>trend(F(0,0)),150)});
 </script></body></html>
